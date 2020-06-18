@@ -1,5 +1,5 @@
 FLOW_COMMIT = a1f9a4c709dcebb27a5084acf47755fbae699c25
-TEST262_COMMIT = 28b4fcca4b1b1d278dfe0cc0e69c7d9d59b31aab
+TEST262_COMMIT = 058adfed86b1d4129996faaf50a85ea55379a66a
 TYPESCRIPT_COMMIT = 5fc917be2e4dd64c8e9504d36615cd7fbfdd4cd3
 
 FORCE_PUBLISH = "@babel/runtime,@babel/runtime-corejs2,@babel/runtime-corejs3,@babel/standalone"
@@ -172,8 +172,8 @@ test-flow:
 test-flow-ci: build-bundle-ci bootstrap-flow
 	$(MAKE) test-flow
 
-test-flow-update-whitelist:
-	$(NODE) scripts/parser-tests/flow --update-whitelist
+test-flow-update-allowlist:
+	$(NODE) scripts/parser-tests/flow --update-allowlist
 
 bootstrap-typescript:
 	rm -rf ./build/typescript
@@ -187,8 +187,8 @@ test-typescript:
 test-typescript-ci: build-bundle-ci bootstrap-typescript
 	$(MAKE) test-typescript
 
-test-typescript-update-whitelist:
-	$(NODE) scripts/parser-tests/typescript --update-whitelist
+test-typescript-update-allowlist:
+	$(NODE) scripts/parser-tests/typescript --update-allowlist
 
 bootstrap-test262:
 	rm -rf build/test262
@@ -202,8 +202,8 @@ test-test262:
 test-test262-ci: build-bundle-ci bootstrap-test262
 	$(MAKE) test-test262
 
-test-test262-update-whitelist:
-	$(NODE) scripts/parser-tests/test262 --update-whitelist
+test-test262-update-allowlist:
+	$(NODE) scripts/parser-tests/test262 --update-allowlist
 
 # Does not work on Windows
 clone-license:
@@ -256,11 +256,12 @@ publish-eslint:
 bootstrap-only: lerna-bootstrap
 
 yarn-install: clean-all
-	yarn --ignore-engines
+	# Gitpod prebuilds have a slow network connection, so we need more time
+	yarn --ignore-engines --network-timeout 100000
 
 lerna-bootstrap: yarn-install
 # todo: remove `-- -- --ignore-engines` in Babel 8
-	$(YARN) lerna bootstrap -- -- --ignore-engines
+	$(YARN) lerna bootstrap -- -- --ignore-engines --network-timeout 100000
 
 bootstrap: bootstrap-only
 	$(MAKE) build
